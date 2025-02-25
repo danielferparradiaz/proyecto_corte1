@@ -13,6 +13,8 @@ Este proyecto implementa una versión en Python del juego de Black Jack utilizan
 ## Requisitos
 Para ejecutar este proyecto necesitas tener instalado:
 - Python 3.x
+- git bash
+- visual studio
 
 ## Instalación
 1. Clona este repositorio en tu máquina local:
