@@ -134,16 +134,16 @@ def plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma
 
 
 def pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2):
-    global suma_p1, suma_p2  # Permite modificar las variables globales
+    global suma_p1, suma_p2 
 
     match turno:
         case 1:
             nueva_carta = mazo[random.randint(0, 51)]
             cartas_p1.append(nueva_carta)
-            suma_p1 = suma_cartas(cartas_p1)  # Se actualiza la variable global
+            suma_p1 = suma_cartas(cartas_p1) 
 
             if suma_p1 > 21:
-                global plantado_p1  # También hay que hacer global esta variable
+                global plantado_p1
                 plantado_p1 = True
                 print("{} te pasaste! {} la suma de tu mazo es: {} \nMenos -{} puntos".format(nombre_p1, " , ".join(cartas_p1), suma_p1, suma_p1))
                 cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
@@ -161,7 +161,7 @@ def pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2):
         case 2:
             nueva_carta = mazo[random.randint(0, 51)]
             cartas_p2.append(nueva_carta)
-            suma_p2 = suma_cartas(cartas_p2)  # Se actualiza la variable global
+            suma_p2 = suma_cartas(cartas_p2) 
 
             if suma_p2 > 21:
                 global plantado_p2
