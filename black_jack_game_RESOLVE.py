@@ -101,7 +101,7 @@ def escoger_turno_mostrar_cartas(nombre_p1, nombre_p2, cartas_p1, cartas_p2):
             plantado_p1 = True
             print(f"{nombre_p1} tienes BlackJack! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
         else:
-            print(f"Empieza {nombre_p1}, tus cartas son: {', '.join(cartas_p1)} y la suma es: {suma_p1}")
+            print(f"Empieza {nombre_p1}, tus cartas son: {', '.join(cartas_p1)} tienes: {suma_p1}")
         plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
     else:
         if suma_p2 > 21:
@@ -111,7 +111,7 @@ def escoger_turno_mostrar_cartas(nombre_p1, nombre_p2, cartas_p1, cartas_p2):
             plantado_p2 = True
             print(f"{nombre_p2} tienes BlackJack! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
         else:
-            print(f"Empieza {nombre_p2}, tus cartas son: {', '.join(cartas_p2)} y la suma es: {suma_p2}")
+            print(f"Empieza {nombre_p2}, tus cartas son: {', '.join(cartas_p2)} tienes: {suma_p2}")
         plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
 
 
@@ -119,8 +119,15 @@ def escoger_turno_mostrar_cartas(nombre_p1, nombre_p2, cartas_p1, cartas_p2):
 def plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2):
     global plantado_p1, plantado_p2
 
+    if suma_p1 == 21 and not plantado_p1:
+        plantado_p1 = True
+        print(f"¡{nombre_p1} tiene BlackJack! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
+    if suma_p2 == 21 and not plantado_p2:
+        plantado_p2 = True
+        print(f"¡{nombre_p2} tiene BlackJack! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
+
     if plantado_p1 and plantado_p2:
-        mostrar_resultados(nombre_p1, nombre_p2, cartas_p1, cartas_p2)
+        ambos_plantados(plantado_p1, plantado_p2, suma_p1, suma_p2, nombre_p1, nombre_p2)
         return
 
     print("[1] Para pedir carta \n[2] Para plantarse")
@@ -130,6 +137,7 @@ def plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma
         pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2)
     elif opcion == "2":
         plantarse(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+
 
 
 
@@ -145,18 +153,18 @@ def pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2):
             if suma_p1 > 21:
                 global plantado_p1
                 plantado_p1 = True
-                print("{} te pasaste! {} la suma de tu mazo es: {} \nMenos -{} puntos".format(nombre_p1, " , ".join(cartas_p1), suma_p1, suma_p1))
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+                print(f"{nombre_p1} te pasaste! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
+                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
                 return
             
             if suma_p1 == 21:
                 plantado_p1 = True
-                print("{} tienes BlackJack! {} la suma de tu mazo es: {}".format(nombre_p1, " , ".join(cartas_p1), suma_p1))
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+                print(f"{nombre_p1} tienes BlackJack! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
+                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2) 
                 return
 
-            print("{} ahora tienes {} y la suma es: {}".format(nombre_p1, " , ".join(cartas_p1), suma_p1))
-            plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+            print(f"{nombre_p1} ahora tienes {', '.join(cartas_p1)} y la suma es: {suma_p1}")
+            plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
 
         case 2:
             nueva_carta = mazo[random.randint(0, 51)]
@@ -166,31 +174,37 @@ def pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2):
             if suma_p2 > 21:
                 global plantado_p2
                 plantado_p2 = True
-                print("{} te pasaste! {} la suma de tu mazo es: {} \nMenos -{} puntos".format(nombre_p2, " , ".join(cartas_p2), suma_p2, suma_p2))
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+                print(f"{nombre_p2} te pasaste! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
+                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
                 return
             
             if suma_p2 == 21:
                 plantado_p2 = True
-                print("{} tienes BlackJack! {} la suma de tu mazo es: {}".format(nombre_p2, " , ".join(cartas_p2), suma_p2))
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+                print(f"¡{nombre_p2} tienes BlackJack! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
+                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2) 
                 return
 
-            print("{} ahora tienes {} y la suma es: {}".format(nombre_p2, " , ".join(cartas_p2), suma_p2))
+            print(f"{nombre_p2} ahora tienes {', '.join(cartas_p2)} y la suma es: {suma_p2}")
             plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
 
 
 
+
 def plantarse(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1):
+    global plantado_p1, plantado_p2
+
     match turno:
         case 1: 
             plantado_p1 = True
             print("{} se ha plantado".format(nombre_p1))
-            cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
         case 2: 
             plantado_p2 = True
             print("{} se ha plantado".format(nombre_p2))
-            cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+
+    ambos_plantados(plantado_p1, plantado_p2, suma_p1, suma_p2, nombre_p1, nombre_p2)
+    cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
+
+
         
         
 def cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1):
@@ -203,11 +217,20 @@ def cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, 
             turno = 1
             print("{} es tu turno tus cartas son {} la suma de tu maso es {}".format(nombre_p1, " , ".join(cartas_p1 ), suma_p1))
             plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-            
-            
 
-def mostrar_resultados(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2):
-    print("{} tiene {} que suman {} \n{} tiene {} que suman".format(nombre_p1," , ".join(cartas_p1), nombre_p2, cartas_p2))
 
+def ambos_plantados(plantado_p1, plantado_p2, suma_p1, suma_p2, nombre_p1, nombre_p2):
+    if plantado_p1 and plantado_p2:
+        if suma_p1 > suma_p2:
+            print(f"Gana {nombre_p1}")
+        elif suma_p2 > suma_p1:
+            print(f"Gana {nombre_p2}")
+        else:
+            print("¡Empate!")
+        exit() 
+
+
+
+        
 
 iniciar_juego()
