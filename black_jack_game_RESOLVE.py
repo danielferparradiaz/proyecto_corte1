@@ -1,236 +1,114 @@
-# TODO: Problema 4.
-# Diseñe e implemente una aplicación que permita jugar una versión 'Pythonica' del juego
-# Black Jack (utilizando un mazo estándar de 52 cartas) con las siguientes especificaciones:
-# - Al inicio del juego, se revuelven las cartas y se reparten para dos jugadores.
-# - Se escoge aleatoriamente cuál de los dos jugadores hace el primer movimiento.
-# - Cada jugador en su turno tiene la opción de tomar una nueva carta o plantarse.
-# - Cada jugador tiene 50 créditos para apostar y en cada juego solo apostará hasta 10
-# créditos. 
-# - El ganador será el jugador que termine con 100 créditos.
-# La aplicación debe estar construida usando funciones.
-# Ustedes son libres de escoger los elementos gráficos y de jugabilidad que consideren
-# adecuados. También son libres de elegir las soluciones que no se encuentren definidas
-# dentro de las especificaciones. 
-
-# Metodología
-#  El proyecto debe ser desarrollado en grupos de hasta cuatro personas (mínimo tres
-# personas).
-#  Para cada problema los entregables son:
-# 1. Análisis del problema.
-# 2. Algoritmo en pseudocódigo.
-# 3. Implementación funcional en Python.
-# 4. Evidencias de ejecución del programa mediante capturas de pantalla.
-# Entregables
-#  (30%) Se debe entregar un informe en PDF con los puntos 1,2 y 4 de la metodología.
-#  (40%) Código en Python debidamente comentado (notebook de Jupyter) y subido a
-# GitHub.
-#  (30%) Sustentación: jueves 06 de marzo de 2025 en el horario de clase.
-
 import random
 
-import re
+# Definir los valores de las cartas
+valores_cartas = {
+    "A": 11, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7,
+    "8": 8, "9": 9, "10": 10, "J": 10, "Q": 10, "K": 10
+}
 
-mazo = [
-    "2♠️", "3♠️", "4♠️", "5♠️", "6♠️", "7♠️", "8♠️", "9♠️", "10♠️", "J♠️", "Q♠️", "K♠️", "A♠️",
-    "2♦️", "3♦️", "4♦️", "5♦️", "6♦️", "7♦️", "8♦️", "9♦️", "10♦️", "J♦️", "Q♦️", "K♦️", "A♦️",
-    "2♥️", "3♥️", "4♥️", "5♥️", "6♥️", "7♥️", "8♥️", "9♥️", "10♥️", "J♥️", "Q♥️", "K♥️", "A♥️",
-    "2♣️", "3♣️", "4♣️", "5♣️", "6♣️", "7♣️", "8♣️", "9♣️", "10♣️", "J♣️", "Q♣️", "K♣️", "A♣️",
-]
+palos = ["♠️", "♥️", "♦️", "♣️"]
 
-turno = 0
-creditos_p1 = 50
-creditos_p2 = 50
+ronda = 0
 
-plantado_p1 = False
-plantado_p2 = False
+def crear_mazo():
+    """ Crea y baraja un mazo de cartas. """
+    mazo = [(carta, palo) for carta in valores_cartas.keys() for palo in palos]
+    random.shuffle(mazo)
+    return mazo
 
-suma_p1 = 0
-suma_p2 = 0
+def calcular_puntaje(mano):
+    total = sum(valores_cartas[carta] for carta, _ in mano)
+    ases = sum(1 for carta, _ in mano if carta == "A")
+    
+    while total > 21 and ases:
+        total -= 10  # Convertimos un As de 11 a 1
+        ases -= 1
+    
+    return total
 
+def mostrar_mano(nombre, mano):
+    print(f"\n{nombre}: {', '.join(f'{carta}{palo}' for carta, palo in mano)} - Puntaje: {calcular_puntaje(mano)}")
 
+def jugar_blackjack():
+    credito_jugador = 50
+    credito_computadora = 50
+    apuesta = 10  # Apuesta fija
+    global ronda
+    
+    print("\n" + "=" * 60)
+    print(" " * 9 + "♠️ ♦️ ♥️ ♣️ ¡BIENVENIDO AL BLACKJACK! ♠️ ♦️ ♥️ ♣️")
+    print("=" * 60 + "\n")
+    
+    while credito_jugador > 0 and credito_computadora > 0:
+        ronda += 1
+        print("-------------------")
+        print("Ronda: #{}".format(ronda))
+        
+        # Crear y barajar un mazo nuevo en cada ronda
+        mazo = crear_mazo()
 
-
-def iniciar_juego():
-    nombre_p1, nombre_p2 = pedir_nombres()
-    cartas_p1, cartas_p2 = repartir_cartas()
-    escoger_turno_mostrar_cartas(nombre_p1, nombre_p2, cartas_p1, cartas_p2)
-
-
-
-def pedir_nombres():
-    nombre_1 = input("El jugador 1 ingresa su nombre: ")
-    nombre_2 = input("El jugador 2 ingresa su nombre: ")
-    return nombre_1.capitalize(), nombre_2.capitalize()
-
-
-
-def repartir_cartas():
-    cartas = random.sample(mazo, 4)
-    return cartas[:2], cartas[2:]
-
-
-
-def valor_carta(carta):
-    valor = re.findall(r'\d+|[JQKA]', carta)[0]  # Extrae solo el número o letra
-    if valor.isdigit():
-        return int(valor)
-    elif valor in ['J', 'Q', 'K']:
-        return 10
-    elif valor == 'A':
-        return 11 
-    return 0
-
-
-
-def suma_cartas(cartas):
-    return sum(valor_carta(carta) for carta in cartas)
-
-
-def escoger_turno_mostrar_cartas(nombre_p1, nombre_p2, cartas_p1, cartas_p2):
-    global turno, plantado_p1, plantado_p2, suma_p1, suma_p2
-
-    turno = random.randint(1, 2)
-    suma_p1 = suma_cartas(cartas_p1)
-    suma_p2 = suma_cartas(cartas_p2)
-
-    if turno == 1:
-        if suma_p1 > 21:
-            plantado_p1 = True
-            print(f"{nombre_p1} te pasaste! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1} \nMenos -{suma_p1} puntos")
-        elif suma_p1 == 21:
-            plantado_p1 = True
-            print(f"{nombre_p1} tienes BlackJack! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
+        # Repartir cartas
+        mano_jugador = [mazo.pop(), mazo.pop()]
+        mano_computadora = [mazo.pop(), mazo.pop()]
+        
+        mostrar_mano("Jugador", mano_jugador)
+        mostrar_mano("Computadora", mano_computadora)
+        
+        puntaje_jugador = calcular_puntaje(mano_jugador)
+        puntaje_computadora = calcular_puntaje(mano_computadora)
+        
+        # Verificar Blackjack natural
+        if puntaje_jugador == 21 and puntaje_computadora == 21:
+            print("\n♦️♠️Empate con Blackjack!♥️♣️")
+        elif puntaje_jugador == 21:
+            print("\n♦️♠️Jugador gana con Blackjack!♥️♣️")
+            credito_jugador += apuesta
+            credito_computadora -= apuesta
+        elif puntaje_computadora == 21:
+            print("\n♦️♠️Computadora gana con Blackjack!♥️♣️")
+            credito_jugador -= apuesta
+            credito_computadora += apuesta
         else:
-            print(f"Empieza {nombre_p1}, tus cartas son: {', '.join(cartas_p1)} tienes: {suma_p1}")
-        plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-    else:
-        if suma_p2 > 21:
-            plantado_p2 = True
-            print(f"{nombre_p2} te pasaste! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2} \nMenos -{suma_p2} puntos")
-        elif suma_p2 == 21:
-            plantado_p2 = True
-            print(f"{nombre_p2} tienes BlackJack! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
-        else:
-            print(f"Empieza {nombre_p2}, tus cartas son: {', '.join(cartas_p2)} tienes: {suma_p2}")
-        plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-
-
-
-def plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2):
-    global plantado_p1, plantado_p2
-
-    if suma_p1 == 21 and not plantado_p1:
-        plantado_p1 = True
-        print(f"¡{nombre_p1} tiene BlackJack! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
-    if suma_p2 == 21 and not plantado_p2:
-        plantado_p2 = True
-        print(f"¡{nombre_p2} tiene BlackJack! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
-
-    if plantado_p1 and plantado_p2:
-        ambos_plantados(plantado_p1, plantado_p2, suma_p1, suma_p2, nombre_p1, nombre_p2)
-        return
-
-    print("[1] Para pedir carta \n[2] Para plantarse")
-    opcion = input("Opción: ")
-
-    if opcion == "1":
-        pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2)
-    elif opcion == "2":
-        plantarse(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
-
-
-
-
-def pedir_carta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2):
-    global suma_p1, suma_p2 
-
-    match turno:
-        case 1:
-            nueva_carta = mazo[random.randint(0, 51)]
-            cartas_p1.append(nueva_carta)
-            suma_p1 = suma_cartas(cartas_p1) 
-
-            if suma_p1 > 21:
-                global plantado_p1
-                plantado_p1 = True
-                print(f"{nombre_p1} te pasaste! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-                return
+            # Turno del jugador
+            while puntaje_jugador < 21:
+                accion = input("\n¿Quieres pedir carta? (s/n): ").strip().lower()
+                if accion == "s":
+                    mano_jugador.append(mazo.pop())
+                    puntaje_jugador = calcular_puntaje(mano_jugador)
+                    mostrar_mano("Jugador", mano_jugador)
+                else:
+                    break
             
-            if suma_p1 == 21:
-                plantado_p1 = True
-                print(f"{nombre_p1} tienes BlackJack! {', '.join(cartas_p1)} la suma de tu mazo es: {suma_p1}")
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2) 
-                return
-
-            print(f"{nombre_p1} ahora tienes {', '.join(cartas_p1)} y la suma es: {suma_p1}")
-            plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-
-        case 2:
-            nueva_carta = mazo[random.randint(0, 51)]
-            cartas_p2.append(nueva_carta)
-            suma_p2 = suma_cartas(cartas_p2) 
-
-            if suma_p2 > 21:
-                global plantado_p2
-                plantado_p2 = True
-                print(f"{nombre_p2} te pasaste! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-                return
+            # Turno de la Computadora
+            while puntaje_computadora < 17:
+                mano_computadora.append(mazo.pop())
+                puntaje_computadora = calcular_puntaje(mano_computadora)
+                mostrar_mano("Computadora", mano_computadora)
             
-            if suma_p2 == 21:
-                plantado_p2 = True
-                print(f"¡{nombre_p2} tienes BlackJack! {', '.join(cartas_p2)} la suma de tu mazo es: {suma_p2}")
-                cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2) 
-                return
-
-            print(f"{nombre_p2} ahora tienes {', '.join(cartas_p2)} y la suma es: {suma_p2}")
-            plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-
-
-
-
-def plantarse(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1):
-    global plantado_p1, plantado_p2
-
-    match turno:
-        case 1: 
-            plantado_p1 = True
-            print("{} se ha plantado".format(nombre_p1))
-        case 2: 
-            plantado_p2 = True
-            print("{} se ha plantado".format(nombre_p2))
-
-    ambos_plantados(plantado_p1, plantado_p2, suma_p1, suma_p2, nombre_p1, nombre_p2)
-    cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1)
-
-
+            # Evaluar ganador
+            if puntaje_jugador > 21:
+                print("\n😭🤭Jugador se pasó. Gana Computadora!😭🤭")
+                credito_jugador -= apuesta
+                credito_computadora += apuesta
+            elif puntaje_computadora > 21 or puntaje_jugador > puntaje_computadora:
+                print("\n💥😎Jugador gana!💥😎")
+                credito_jugador += apuesta
+                credito_computadora -= apuesta
+            elif puntaje_computadora > puntaje_jugador:
+                print("\n😵🤢Computadora gana!😵🤢")
+                credito_jugador -= apuesta
+                credito_computadora += apuesta
+            else:
+                print("\nEmpate!")
         
+        print(f"Créditos -> Jugador: {credito_jugador}, Computadora: {credito_computadora}")
+        print(" ")
         
-def cambio_de_turno(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p2, suma_p1):
-    match turno:
-        case 1: 
-            turno = 2
-            print("{} es tu turno tus cartas son {} la suma de tu maso es {}".format(nombre_p2,  " , ".join(cartas_p2), suma_p2))
-            plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
-        case 2: 
-            turno = 1
-            print("{} es tu turno tus cartas son {} la suma de tu maso es {}".format(nombre_p1, " , ".join(cartas_p1 ), suma_p1))
-            plantarse_pedircarta(turno, nombre_p1, nombre_p2, cartas_p1, cartas_p2, suma_p1, suma_p2)
+        if credito_jugador <= 0:
+            print("Te quedaste sin créditos. 🥵 Fin del juego 🥵!")
+            break
+        elif credito_computadora <= 0:
+            print("Computadora se quedó sin créditos. 🏆¡Ganaste el juego!🏆")
+            break
 
-
-def ambos_plantados(plantado_p1, plantado_p2, suma_p1, suma_p2, nombre_p1, nombre_p2):
-    if plantado_p1 and plantado_p2:
-        if suma_p1 > suma_p2:
-            print(f"Gana {nombre_p1}")
-        elif suma_p2 > suma_p1:
-            print(f"Gana {nombre_p2}")
-        else:
-            print("¡Empate!")
-        exit() 
-
-
-
-        
-
-iniciar_juego()
+jugar_blackjack()
